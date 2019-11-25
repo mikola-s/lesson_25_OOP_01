@@ -2,43 +2,44 @@
 
 
 class TemperatureScale:
-    def __init__(self, **kwargs):
-        self.name = kwargs['name']
-        self.name_ru = kwargs['name_ru']
-        self.abs_zero = kwargs['absolute_zero']
-        self.freeze_point = kwargs['freezing_point']
-        self.boil_point = kwargs['boiling_point']
-        self.d_h20_aggregate = kwargs['boiling_point'] - kwargs['freezing_point']
-        self.units = kwargs['units']
+    def __init__(self,
+                 name='Kelvin',
+                 name_ru='Кельвин',
+                 absolute_zero=0,
+                 freezing_point=273.2,
+                 boiling_point=373.2,
+                 units='K'):
+        self.name = name
+        self.name_ru = name_ru
+        self.abs_zero = absolute_zero
+        self.freeze_point = freezing_point
+        self.boil_point = boiling_point
+        self.units = units
+
+        self.d_h20_aggregate = boiling_point - freezing_point
         self.val = None
 
 
-class Temperature:
+class TemperatureProcessing:
     def get_user_choice(self, args: list) -> list:
         """ запрашивает у пользователя данные в stdin """
 
-        print(' Пользователь! \nвведи единицы температуры которую хочешь преобразовать\n'
-              '(например: 1)\n'
-              f'1. {args[0].name_ru}\n'
-              f'2. {args[1].name_ru}\n'
-              f'3. {args[2].name_ru}\n'
-              )
-        item = int(input()) - 1
+        print(' Пользователь! \nвведи единицы температуры для преобразования\n(например: 1)')
+        [print(f'{item + 1}. {args[item].name_ru}') for item in range(len(args))]
+        item = int(input() - 1)
         selected_scale = args[item]
         del args[item]
 
         print('теперь введи значение температуры (например: 100)\n')
         selected_scale.val = float(input())
 
-        print('введи номер шкалы температуры в которую хочешь конвертировать\n'
-              '(например: 1)\n'
-              f'1. {args[0].name_ru} \n'
-              f'2. {args[1].name_ru} \n')
+        print('введи номер шкалы температуры в которую хочешь конвертировать\n(например: 1)\n')
+        [print(f'{item + 1}. {args[item].name_ru}') for item in range(len(args))]
         change_to_scale = args[int(input()) - 1]
 
         return [selected_scale, change_to_scale]
 
-    def convert_temperature(self, ch_from: object, ch_to: object) -> object:
+    def change_temperature_scale(self, ch_from: object, ch_to: object) -> object:
         """ вычисляет значение температуры в заданной шкале
         ch_to.val -- вычисляемая температура
         ch_to.abs_zero -- значение абсолютного нуля для вычисляемой температуры
@@ -53,45 +54,40 @@ class Temperature:
 
         return ch_to
 
-    def print_result(self, result):
+    def show_to_user(self, result):
         """выводит результаты вычислений в stdout"""
         print('Пользователь! результат моих вычислений:\n'
               f'{round(result.val, 2)} {result.units}')
 
 
-kelvin = TemperatureScale(
-    name='Kelvin',
-    name_ru='Кельвин',
-    absolute_zero=0,
-    freezing_point=273.2,  # K
-    boiling_point=373.2,
-    units='K',
-)
+celsius = {
+    'name': 'Celsius',
+    'name_ru': 'Цельсий',
+    'absolute_zero': -273.2,
+    'freezing_point': 0,  # °C
+    'boiling_point': 100,
+    'units': '°C',
+}
 
-celsius = TemperatureScale(
-    name='Celsius',
-    name_ru='Цельсий',
-    absolute_zero=-273.2,
-    freezing_point=0,  # °C
-    boiling_point=100,
-    units='°C',
-)
+fahrenheit = {
+    'name': 'Fahrenheit',
+    'name_ru': 'Фаренгейт',
+    'absolute_zero': -459.67,
+    'freezing_point': 32,  # °F
+    'boiling_point': 212,
+    'units': '°F',
+}
 
-fahrenheit = TemperatureScale(
-    name='Fahrenheit',
-    name_ru='Фаренгейт',
-    absolute_zero=-459.67,
-    freezing_point=32,  # °F
-    boiling_point=212,
-    units='°F',
-)
+temperature_scales = [
+    TemperatureScale(),  # сисок с температурными шкалами
+    TemperatureScale(**celsius),
+    TemperatureScale(**fahrenheit),
+]
 
-temperature_scales = [kelvin, celsius, fahrenheit]  # сисок с температурными шкалами
-
-temp_change = Temperature()
-
-user_choice = temp_change.get_user_choice(temperature_scales)  # данные от пользователя
-
-convert_result = temp_change.convert_temperature(*user_choice)  # вычисления температуры
-
-temp_change.print_result(convert_result)  # вывод результата в std_out
+# temp_change = Temperature()
+#
+# user_choice = temp_change.get_user_choice(temperature_scales)  # данные от пользователя
+#
+# convert_result = temp_change.convert_temperature(*user_choice)  # вычисления температуры
+#
+# temp_change.print_result(convert_result)  # вывод результата в std_out
